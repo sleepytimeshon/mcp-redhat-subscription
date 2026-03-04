@@ -1,0 +1,10 @@
+{
+  "name": "@shonstephens/mcp-redhat-subscription",
+  "version": "0.1.0",
+  "description": "MCP server for Red Hat Subscription Management",
+  "private": false,
+  "publishConfig": {
+    "access": "restricted"
+  },
+  "license": "MIT"
+}
