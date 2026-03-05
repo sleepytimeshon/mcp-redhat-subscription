@@ -1,10 +1,32 @@
 {
-  "name": "@shonstephens/mcp-redhat-subscription",
-  "version": "0.1.0",
-  "description": "MCP server for Red Hat Subscription Management",
-  "private": false,
-  "publishConfig": {
-    "access": "restricted"
+  "name": "mcp-redhat-subscription",
+  "version": "1.0.0",
+  "description": "MCP server for Red Hat Subscription Management API",
+  "type": "module",
+  "bin": {
+    "mcp-redhat-subscription": "./src/index.js"
   },
-  "license": "MIT"
+  "main": "./src/index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "keywords": [
+    "mcp",
+    "redhat",
+    "subscription",
+    "rhsm"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shonstephens/mcp-redhat-subscription.git"
+  },
+  "homepage": "https://github.com/shonstephens/mcp-redhat-subscription#readme",
+  "bugs": {
+    "url": "https://github.com/shonstephens/mcp-redhat-subscription/issues"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.26.0",
+    "zod": "^3.25.0"
+  }
 }
