@@ -102,6 +102,41 @@ Set your Red Hat offline API token in your shell profile:
 export REDHAT_TOKEN="your-offline-token-here"
 ```
 
+### Gemini CLI
+
+Add to `~/.gemini/settings.json`:
+
+```json
+{
+  "mcpServers": {
+    "redhat-subscription": {
+      "command": "npx",
+      "args": ["-y", "mcp-redhat-subscription"],
+      "env": {
+        "REDHAT_TOKEN": "$REDHAT_TOKEN"
+      }
+    }
+  }
+}
+```
+
+### watsonx Orchestrate
+
+```bash
+# Add a connection for the Red Hat API token
+orchestrate connections add --app-id "redhat-subscription"
+orchestrate connections configure --app-id redhat-subscription --env draft --kind key_value --type team --url "https://access.redhat.com"
+orchestrate connections set-credentials --app-id "redhat-subscription" --env draft -e REDHAT_TOKEN=your-offline-token-here
+
+# Import the MCP toolkit
+orchestrate toolkits import --kind mcp \
+  --name redhat-subscription \
+  --description "Red Hat Subscription Management" \
+  --command "npx -y mcp-redhat-subscription" \
+  --tools "*" \
+  --app-id redhat-subscription
+```
+
 ### Claude Code
 
 Add to `~/.claude/settings.json`:
