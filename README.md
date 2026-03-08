@@ -102,6 +102,8 @@ Set your Red Hat offline API token in your shell profile:
 export REDHAT_TOKEN="your-offline-token-here"
 ```
 
+In enterprise environments, provide `REDHAT_TOKEN` through your secrets management solution (e.g. HashiCorp Vault, Kubernetes secrets, or your CI platform's secret variables) rather than shell profiles.
+
 ### Gemini CLI
 
 Add to `~/.gemini/settings.json`:
