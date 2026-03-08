@@ -96,38 +96,58 @@ An [MCP](https://modelcontextprotocol.io/) server for the Red Hat Subscription M
 
 ## Configuration
 
-### Claude Desktop / Claude Code
+Set your Red Hat offline API token in your shell profile:
+
+```bash
+export REDHAT_TOKEN="your-offline-token-here"
+```
+
+### Claude Code
+
+Add to `~/.claude/settings.json`:
 
 ```json
 {
   "mcpServers": {
     "redhat-subscription": {
-      "command": "node",
-      "args": ["/path/to/mcp-redhat-subscription/src/index.js"],
+      "command": "npx",
+      "args": ["-y", "mcp-redhat-subscription"],
       "env": {
-        "REDHAT_TOKEN": "your-offline-token"
+        "REDHAT_TOKEN": "${REDHAT_TOKEN}"
       }
     }
   }
 }
 ```
 
-### Environment Variables
+### VS Code / Cursor
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `REDHAT_TOKEN` | Yes | Red Hat offline API token for authentication |
+Add to `.vscode/mcp.json` in your workspace:
 
-## API Reference
+```json
+{
+  "mcpServers": {
+    "redhat-subscription": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "mcp-redhat-subscription"],
+      "env": {
+        "REDHAT_TOKEN": "${REDHAT_TOKEN}"
+      }
+    }
+  }
+}
+```
 
-This server wraps the [Red Hat Subscription Management API](https://access.redhat.com/articles/3626371) at `https://api.access.redhat.com/management/v1/`.
+## Authentication
 
-Authentication uses OAuth2 token exchange via Red Hat SSO (`sso.redhat.com`, client_id `rhsm-api`). Tokens are cached and refreshed automatically.
+The server exchanges your Red Hat offline API token for a short-lived bearer token via Red Hat SSO. Tokens are cached and refreshed automatically.
 
 ## Related MCP Servers
 
-- [mcp-redhat-support](https://github.com/shonstephens/mcp-redhat-support) - Red Hat support case management
-- [mcp-redhat-knowledge](https://github.com/shonstephens/mcp-redhat-knowledge) - Red Hat Knowledge Base search
+- [mcp-redhat-support](https://github.com/shonstephens/mcp-redhat-support) - Support case management
+- [mcp-redhat-account](https://github.com/shonstephens/mcp-redhat-account) - Account management
+- [mcp-redhat-knowledge](https://github.com/shonstephens/mcp-redhat-knowledge) - Knowledge Base search
 
 ## License
 
