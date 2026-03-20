@@ -182,10 +182,10 @@ The server exchanges your Red Hat offline API token for a short-lived bearer tok
 
 ## Related MCP Servers
 
-- [mcp-redhat-account](https://github.com/shonstephens/mcp-redhat-account) - Account management
-- [mcp-redhat-knowledge](https://github.com/shonstephens/mcp-redhat-knowledge) - Knowledge Base search
-- [mcp-redhat-manpage](https://github.com/shonstephens/mcp-redhat-manpage) - RHEL man pages
-- [mcp-redhat-support](https://github.com/shonstephens/mcp-redhat-support) - Support case management
+- [mcp-redhat-account](https://github.com/sleepytimeshon/mcp-redhat-account) - Account management
+- [mcp-redhat-knowledge](https://github.com/sleepytimeshon/mcp-redhat-knowledge) - Knowledge Base search
+- [mcp-redhat-manpage](https://github.com/sleepytimeshon/mcp-redhat-manpage) - RHEL man pages
+- [mcp-redhat-support](https://github.com/sleepytimeshon/mcp-redhat-support) - Support case management
 
 ## License
 

@@ -1,6 +1,6 @@
 {
   "name": "mcp-redhat-subscription",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "MCP server for Red Hat Subscription Management API",
   "type": "module",
   "bin": {
@@ -19,11 +19,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/shonstephens/mcp-redhat-subscription.git"
+    "url": "git+https://github.com/sleepytimeshon/mcp-redhat-subscription.git"
   },
-  "homepage": "https://github.com/shonstephens/mcp-redhat-subscription#readme",
+  "homepage": "https://github.com/sleepytimeshon/mcp-redhat-subscription#readme",
   "bugs": {
-    "url": "https://github.com/shonstephens/mcp-redhat-subscription/issues"
+    "url": "https://github.com/sleepytimeshon/mcp-redhat-subscription/issues"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.26.0",
