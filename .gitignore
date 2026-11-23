@@ -1,3 +1,15 @@
+# Dependencies are installed from package-lock.json with npm ci, never committed
 node_modules/
+
+# Release tarballs from npm pack are published to npm, not committed
 *.tgz
+
+# npm debug logs
+npm-debug.log*
+
+# Local environment files may hold REDHAT_TOKEN; credentials never belong in Git
+.env
+.env.*
+
+# Editor project settings are per-developer
 jsconfig.json
