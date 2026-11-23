@@ -103,7 +103,7 @@ Pass that `respOffset` back to fetch the next chunk. Small responses return in o
 
 ## Prerequisites
 
-- Node.js 18+
+- Node.js 18.14.1+
 - A Red Hat offline API token ([generate one here](https://access.redhat.com/management/api))
 
 ## Configuration
@@ -115,6 +115,15 @@ export REDHAT_TOKEN="your-offline-token-here"
 ```
 
 In enterprise environments, provide `REDHAT_TOKEN` through your secrets management solution (e.g. HashiCorp Vault, Kubernetes secrets, or your CI platform's secret variables) rather than shell profiles.
+
+The offline token expires if it is not used for 30 days; generate a new one from the same page if authentication starts failing.
+
+### Pinning a version
+
+The examples below run `npx -y mcp-redhat-subscription`, which fetches the latest published release each time the server starts. For operational use, pin a version so upgrades happen deliberately:
+
+- Replace `mcp-redhat-subscription` in `args` with `mcp-redhat-subscription@<version>` (e.g. `mcp-redhat-subscription@2.1.0`), or
+- Install it once with `npm install -g mcp-redhat-subscription@<version>` and use `mcp-redhat-subscription` as the `command` with no `args`.
 
 ### Gemini CLI
 
@@ -153,7 +162,17 @@ orchestrate toolkits import --kind mcp \
 
 ### Claude Code
 
-Add to `~/.claude/settings.json`:
+Claude Code reads MCP servers from `~/.claude.json` (user and local scopes) or a project's `.mcp.json`, not from `settings.json`.
+
+To make the server available in every project, add it at user scope:
+
+```bash
+claude mcp add redhat-subscription --scope user \
+  -e REDHAT_TOKEN="$REDHAT_TOKEN" \
+  -- npx -y mcp-redhat-subscription
+```
+
+This stores the token's value in `~/.claude.json`. To keep the token out of configuration files, add the server to a project's `.mcp.json` instead; Claude Code expands `${REDHAT_TOKEN}` from the environment when it starts the server:
 
 ```json
 {
@@ -169,19 +188,39 @@ Add to `~/.claude/settings.json`:
 }
 ```
 
-### VS Code / Cursor
+Run `claude mcp list` to confirm the server connects.
+
+### VS Code
 
 Add to `.vscode/mcp.json` in your workspace:
 
 ```json
 {
-  "mcpServers": {
+  "servers": {
     "redhat-subscription": {
       "type": "stdio",
       "command": "npx",
       "args": ["-y", "mcp-redhat-subscription"],
       "env": {
-        "REDHAT_TOKEN": "${REDHAT_TOKEN}"
+        "REDHAT_TOKEN": "${env:REDHAT_TOKEN}"
+      }
+    }
+  }
+}
+```
+
+### Cursor
+
+Add to `.cursor/mcp.json` in your workspace, or `~/.cursor/mcp.json` for all workspaces:
+
+```json
+{
+  "mcpServers": {
+    "redhat-subscription": {
+      "command": "npx",
+      "args": ["-y", "mcp-redhat-subscription"],
+      "env": {
+        "REDHAT_TOKEN": "${env:REDHAT_TOKEN}"
       }
     }
   }
