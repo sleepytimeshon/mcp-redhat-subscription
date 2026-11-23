@@ -1,6 +1,6 @@
 {
   "name": "mcp-redhat-subscription",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "MCP server for Red Hat Subscription Management API",
   "type": "module",
   "bin": {
