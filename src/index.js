@@ -132,7 +132,7 @@ function paginationParams(limit, offset) {
 
 const server = new McpServer({
   name: "mcp-redhat-subscription",
-  version: "2.1.1",
+  version: "2.1.2",
 });
 
 // === Subscriptions ===

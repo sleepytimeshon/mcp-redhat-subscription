@@ -4,8 +4,13 @@ All notable changes to this project are documented in this file. The format is b
 
 ## [Unreleased]
 
+## [2.1.2] - 2026-11-23
+
 ### Added
 - This changelog, included in the published package.
+
+### Security
+- Upgrade `@modelcontextprotocol/sdk` to 1.32.2 and `zod` to 4.6.7, and refresh the lockfile, clearing every `npm audit` advisory (1 critical, 8 high, 2 moderate) in the SDK, zod, and their transitive dependencies.
 
 ## [2.1.1] - 2026-11-23
 
@@ -53,7 +58,8 @@ All notable changes to this project are documented in this file. The format is b
 ### Added
 - First public release: an MCP server covering the Red Hat Subscription Management API with 45 tools for subscriptions, systems, allocations, errata, packages, images, cloud access, and organization.
 
-[Unreleased]: https://github.com/sleepytimeshon/mcp-redhat-subscription/compare/v2.1.1...HEAD
+[Unreleased]: https://github.com/sleepytimeshon/mcp-redhat-subscription/compare/v2.1.2...HEAD
+[2.1.2]: https://www.npmjs.com/package/mcp-redhat-subscription/v/2.1.2
 [2.1.1]: https://www.npmjs.com/package/mcp-redhat-subscription/v/2.1.1
 [2.1.0]: https://www.npmjs.com/package/mcp-redhat-subscription/v/2.1.0
 [2.0.3]: https://www.npmjs.com/package/mcp-redhat-subscription/v/2.0.3
