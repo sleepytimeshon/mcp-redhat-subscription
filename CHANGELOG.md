@@ -4,6 +4,35 @@ All notable changes to this project are documented in this file. The format is b
 
 ## [Unreleased]
 
+## [3.0.0] - 2026-11-27
+
+### Added
+- `updateCloudProviderAccountTenantId` tool, for the Azure tenant ID of a Microsoft Azure Cloud Access account.
+- `listSubscriptions` filters by status and by text in the name or SKU.
+- `getSystem` takes several `include` sections at once and a `factsFilter`; `getAllocation` includes attached entitlements.
+- Offline unit tests (`test/unit.mjs`), run by `npm test`.
+
+### Changed
+- Tool output is Markdown for a language model instead of raw API JSON: tables for listings, labeled fields for details, empty fields dropped.
+- Paging is consistent with the other Red Hat MCP servers: `offset` and `limit` page the rendered output in characters (formerly `respOffset` and `respLimit`), and `maxResults` and `startAt` page API results (formerly `limit` and `offset`). `maxResults` is capped at each endpoint's API maximum, and a full page notes that more results may exist.
+- `downloadImage` and `downloadPackage` return the short-lived CDN download link by default; with `save: true` they stream the file into `REDHAT_DOWNLOAD_DIR` (default `~/redhat-downloads`). `downloadAllocationExport` writes there too. Downloads never overwrite a file unless `overwrite` is true, and never send the Red Hat token to the CDN.
+- `attachSystemEntitlement` and `attachAllocationEntitlement` take `poolId` instead of `pool`; `removeAllocation` takes `confirm: true` instead of `force`.
+- `listSystems` filters by `name` instead of `filter`; `listSystemPackages` takes `upgradableOnly`, `withErrata`, and `name`; `listAllocationPools` takes `includeFuture`; `getOrganization` takes `includeSystemPurpose`.
+- `listErrata` and `listErratumSystems` report that no errata apply when the API answers 404.
+- Identifiers (UUIDs, checksums, advisory IDs, content set labels, architectures, provider names) are validated before they reach a request URL.
+- API errors are reported as one readable line, and a rejected cached access token is exchanged again once.
+- API client, validation, and formatters moved to `src/lib.js`.
+
+### Fixed
+- Every Red Hat API request times out after 30 seconds (1 hour for file downloads) instead of waiting indefinitely on a stalled endpoint.
+- `getSubscription` always failed: the API has no single-subscription endpoint, so it now searches the subscription list.
+- `verifyCloudProviderAccount` always failed: it sent an empty body, and now sends the instance identity document and signature the API requires.
+- `removeCloudProviderAccountBySourceId` sent `sourceID` instead of the API's `source_id` parameter.
+- `downloadImage`, `downloadPackage`, and `downloadAllocationExport` held the whole file in memory (multi-gigabyte ISOs could exhaust it) and wrote to any path, overwriting existing files.
+- `updateAllocation` offered name and version changes that the API does not support; it now sets only simple content access (`enabled` or `disabled`).
+- `listPackagesByContentSetArch` offered a name filter that the API ignores; it now offers `latestOnly`, the filter the API supports.
+- `limit` values above an endpoint's maximum were silently capped, so a full page looked complete.
+
 ## [2.1.2] - 2026-11-23
 
 ### Added
@@ -58,7 +87,8 @@ All notable changes to this project are documented in this file. The format is b
 ### Added
 - First public release: an MCP server covering the Red Hat Subscription Management API with 45 tools for subscriptions, systems, allocations, errata, packages, images, cloud access, and organization.
 
-[Unreleased]: https://github.com/sleepytimeshon/mcp-redhat-subscription/compare/v2.1.2...HEAD
+[Unreleased]: https://github.com/sleepytimeshon/mcp-redhat-subscription/compare/v3.0.0...HEAD
+[3.0.0]: https://www.npmjs.com/package/mcp-redhat-subscription/v/3.0.0
 [2.1.2]: https://www.npmjs.com/package/mcp-redhat-subscription/v/2.1.2
 [2.1.1]: https://www.npmjs.com/package/mcp-redhat-subscription/v/2.1.1
 [2.1.0]: https://www.npmjs.com/package/mcp-redhat-subscription/v/2.1.0

@@ -8,8 +8,8 @@ An [MCP](https://modelcontextprotocol.io/) server for the Red Hat Subscription M
 
 | Tool | Description |
 |------|-------------|
-| `listSubscriptions` | List Red Hat subscriptions for the authenticated account |
-| `getSubscription` | Get details of a specific subscription including pools and consumed quantities |
+| `listSubscriptions` | List subscriptions with SKU, quantity, status, dates, and pool usage; filter by status or name/SKU text |
+| `getSubscription` | Get one subscription by number, with its pools (searches the subscription list) |
 | `listSubscriptionContentSets` | List all content sets for a subscription |
 | `listSubscriptionSystems` | List all systems consuming a subscription |
 
@@ -18,13 +18,13 @@ An [MCP](https://modelcontextprotocol.io/) server for the Red Hat Subscription M
 | Tool | Description |
 |------|-------------|
 | `listSystems` | List systems registered with Red Hat Subscription Management |
-| `getSystem` | Get details of a specific registered system |
-| `removeSystem` | Remove a system profile |
+| `getSystem` | Get a system's status, compliance, and errata counts, plus optional installed products, entitlements, and filterable facts |
+| `removeSystem` | Unregister a system |
 | `attachSystemEntitlement` | Attach an entitlement to a system from a pool |
 | `removeSystemEntitlement` | Remove an entitlement from a system |
 | `listSystemErrata` | List all applicable errata for a system |
-| `listSystemPackages` | List all packages for a system |
-| `listSystemPools` | List all pools for a system |
+| `listSystemPackages` | List a system's packages, optionally only upgradable ones or with errata |
+| `listSystemPools` | List the pools a system can attach entitlements from |
 
 ### Allocations (Satellite Manifests)
 
@@ -33,8 +33,8 @@ An [MCP](https://modelcontextprotocol.io/) server for the Red Hat Subscription M
 | `listAllocations` | List subscription allocations |
 | `getAllocation` | Get details of a specific allocation |
 | `createAllocation` | Create a new Satellite allocation |
-| `updateAllocation` | Update an allocation (name, version, SCA) |
-| `removeAllocation` | Remove an allocation (requires force) |
+| `updateAllocation` | Turn simple content access on or off for an allocation |
+| `removeAllocation` | Remove an allocation (requires `confirm: true`) |
 | `listAllocationVersions` | List available Satellite versions |
 | `listAllocationPools` | List all pools for an allocation |
 | `attachAllocationEntitlement` | Attach an entitlement to an allocation |
@@ -42,7 +42,7 @@ An [MCP](https://modelcontextprotocol.io/) server for the Red Hat Subscription M
 | `removeAllocationEntitlement` | Remove an entitlement from an allocation |
 | `exportAllocation` | Trigger manifest export |
 | `getExportJobStatus` | Check export job status |
-| `downloadAllocationExport` | Download a completed manifest export |
+| `downloadAllocationExport` | Download a completed manifest export into the download directory |
 
 ### Errata
 
@@ -53,7 +53,7 @@ An [MCP](https://modelcontextprotocol.io/) server for the Red Hat Subscription M
 | `getErratum` | Get details of a specific advisory |
 | `listErratumImages` | List updated container images for an advisory |
 | `listErratumPackages` | List all packages for an advisory |
-| `listErratumSystems` | List all systems affected by an advisory |
+| `listErratumSystems` | List the account's systems an advisory applies to |
 
 ### Images
 
@@ -61,15 +61,15 @@ An [MCP](https://modelcontextprotocol.io/) server for the Red Hat Subscription M
 |------|-------------|
 | `listImagesByContentSet` | List available images in a content set |
 | `listImageDownloads` | List RHEL image downloads by version and architecture |
-| `downloadImage` | Download an image by SHA256 checksum |
+| `downloadImage` | Get a short-lived download link for an image, or stream it into the download directory |
 
 ### Packages
 
 | Tool | Description |
 |------|-------------|
-| `listPackagesByContentSetArch` | List packages for a content set and architecture |
+| `listPackagesByContentSetArch` | List packages for a content set and architecture, optionally only the latest versions |
 | `getPackage` | Get details of a package by checksum |
-| `downloadPackage` | Download a package by SHA256 checksum |
+| `downloadPackage` | Get a short-lived download link for a package, or stream it into the download directory |
 
 ### Cloud Access
 
@@ -77,10 +77,11 @@ An [MCP](https://modelcontextprotocol.io/) server for the Red Hat Subscription M
 |------|-------------|
 | `listCloudAccessProviders` | List enabled cloud access providers |
 | `addCloudProviderAccounts` | Add provider accounts (AWS, Azure, GCE) |
-| `updateCloudProviderAccount` | Update a provider account |
+| `updateCloudProviderAccount` | Change a provider account's nickname |
+| `updateCloudProviderAccountTenantId` | Set the Azure tenant ID of a Microsoft Azure account |
 | `removeCloudProviderAccount` | Remove a provider account |
 | `removeCloudProviderAccountBySourceId` | Remove a provider account by source ID |
-| `verifyCloudProviderAccount` | Verify a provider account |
+| `verifyCloudProviderAccount` | Verify a provider account for auto-registration with an instance identity document and signature |
 | `enableGoldImages` | Enable Gold image access for a provider |
 
 ### Organization
@@ -91,15 +92,24 @@ An [MCP](https://modelcontextprotocol.io/) server for the Red Hat Subscription M
 
 ## Pagination
 
-All `list*` tools accept optional `respOffset` (default 0) and `respLimit` (default 30000) parameters to chunk response output. Large list results (e.g. `listSystemPackages` for a system with thousands of packages, `listSystems` at scale) can exceed typical MCP tool-result token caps when returned whole. When a response is truncated, the output ends with a footer like:
+Two kinds of paging apply:
+
+- **Results:** list tools take `maxResults` and `startAt`. Each endpoint caps a page at its API maximum (50 subscriptions, 100 systems, 1000 system packages, and so on), and the API never reports a total, so a full page ends with a note that more results may exist and the `startAt` for the next page.
+- **Output:** every tool that can return a lot accepts `offset` (default 0) and `limit` (default 30000), counted in characters of rendered output. When a response is truncated, it ends with a footer like:
 
 ```
-[truncated: showing chars 0-30000 of 102783. Call again with respOffset=30000 for the next chunk.]
+[truncated: showing chars 0-30000 of 102783. Call again with offset=30000 for the next chunk.]
 ```
 
-Pass that `respOffset` back to fetch the next chunk. Small responses return in one call.
+Pass that `offset` back to fetch the next chunk.
 
-**Naming note:** `limit`/`offset` are reserved on most tools for upstream Red Hat API row-pagination (e.g. `limit=1000` to fetch 1000 system records from the API). Response-character pagination uses `respOffset`/`respLimit` to avoid collision. Both layers can be used together — for example, `limit=1000` to retrieve many rows, then `respOffset` to page through the rendered JSON in chunks.
+## Output
+
+Tool output is Markdown written for a language model: tables for listings, labeled fields for details, and empty fields dropped. `listErrata` and `listErratumSystems` report "no errata apply" when the API answers 404, which it does when no errata match the account's systems.
+
+## Downloads
+
+`downloadImage` and `downloadPackage` return a short-lived Red Hat CDN link by default; request a new one for each download and verify the file against its SHA-256 checksum. With `save: true`, and for `downloadAllocationExport` (a single-use manifest zip), the server streams the file into the download directory, `REDHAT_DOWNLOAD_DIR` (default `~/redhat-downloads`). It refuses paths outside that directory, never overwrites a file unless `overwrite` is true, and never sends the Red Hat token to the CDN.
 
 ## Prerequisites
 
@@ -229,7 +239,7 @@ Add to `.cursor/mcp.json` in your workspace, or `~/.cursor/mcp.json` for all wor
 
 ## Authentication
 
-The server exchanges your Red Hat offline API token for a short-lived bearer token via Red Hat SSO. Tokens are cached and refreshed automatically.
+The server exchanges your Red Hat offline API token for a short-lived bearer token via Red Hat SSO. Tokens are cached, refreshed automatically, and exchanged again if the API rejects a cached one. Requests time out after 30 seconds (1 hour for file downloads).
 
 ## Releasing
 
